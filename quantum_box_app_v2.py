@@ -1,15 +1,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
+from matplotlib.animation import FuncAnimation, PillowWriter
 import streamlit as st
 import streamlit.components.v1 as components
 import tempfile
 import os
+import base64
 
 # Constants
 hbar = 1.0
 m = 1.0
-#L=1
 # Define eigenfunction
 def psi_n(n, x, L):
     return np.sqrt(2 / L) * np.sin(n * np.pi * x / L)
@@ -31,16 +31,7 @@ if "frame" not in st.session_state:
     st.session_state.frame = 0
     
 # Build animation
-import base64
-from matplotlib.animation import PillowWriter
 
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation, PillowWriter
-import tempfile
-import base64
-import os
-import streamlit as st
 
 # Assuming these are defined
 # from your_module import psi_superposed, psi_n
