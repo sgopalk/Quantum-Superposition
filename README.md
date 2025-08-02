@@ -1,6 +1,6 @@
 # Quantum Superposition in 1D Box
 
-A Streamlit app to visualize the time evolution of a quantum particle in a 1D infinite potential well using superposition of eigenstates.
+A Streamlit app to visualize the time evolution of a quantum particle in a 1D infinite potential well using superposition of eigenstates and Collapse of the wavefunction.
 
 # Features
 
