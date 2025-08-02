@@ -108,7 +108,7 @@ c_vals = []
 st.sidebar.header("Quantum States and Coefficients")
 
 # Input number of basis states
-st.sidebar.markdown("### Number of basis states")
+st.sidebar.markdown("### Number of energy eigenstates in the superposition")
 N = st.sidebar.number_input("N", min_value=1, max_value=10, value=3, step=1, key="num_states")
 
 # Input fields for each state
