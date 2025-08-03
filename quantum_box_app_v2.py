@@ -32,8 +32,6 @@ if "frame" not in st.session_state:
     
 # Build animation
 
-
-# Assuming these are defined
 # from your_module import psi_superposed, psi_n
 
 def generate_animation_base64(L, ns, cs, speed=0.009, interval=100):
@@ -193,7 +191,7 @@ if abs(np.sqrt(norm_check)- 1.0) < 1e-3:
 
 
 # Analytical Expression
-st.markdown("### Analytical Expression")
+st.markdown("### Normalized Superposed State in 1D Box")
 expr = " + ".join([
 f"({np.round(c.real, 3)}{f'{np.round(c.imag, 3):+}i' if c.imag else ''})\\Psi_{{{n}}}(x)e^{{-iE_{{{n}}}t/\\hbar}}"
     for n, c in zip(n_vals, c_vals)
