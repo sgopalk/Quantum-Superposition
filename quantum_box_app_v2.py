@@ -1,15 +1,18 @@
+# Simulation to demonstrate Quantum Superposition in a 1D Box
+#Developed by Dr. Gopal Kashyap
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, PillowWriter
 import streamlit as st
 import streamlit.components.v1 as components
 import tempfile
-import os
 import base64
+import os
 
 # Constants
 hbar = 1.0
 m = 1.0
+
 # Define eigenfunction
 def psi_n(n, x, L):
     return np.sqrt(2 / L) * np.sin(n * np.pi * x / L)
@@ -32,6 +35,7 @@ if "frame" not in st.session_state:
     
 # Build animation
 
+# Assuming these are defined
 # from your_module import psi_superposed, psi_n
 
 def generate_animation_base64(L, ns, cs, speed=0.009, interval=100):
@@ -54,35 +58,54 @@ def generate_animation_base64(L, ns, cs, speed=0.009, interval=100):
         return total
 
     x = np.linspace(0, L, 1000)
-    fig, ax = plt.subplots(figsize=(8, 5))
-    line_total, = ax.plot([], [], '-', color='red', label=r'$|\Psi_{\text{total}}|^2$')
-    line_individuals = [ax.plot([], [], '--', label=fr'$|\Psi_{{{n}}}|^2$')[0] for n in ns]
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 
-    ax.set_xlim(0, L)
-    ax.set_ylim(0, 6)
-    ax.set_title('Quantum Particle in 1D Box')
-    ax.set_xlabel('x')
-    ax.set_ylabel('Probability Density')
-    ax.legend()
+# --- Left: Re(Psi) ---
+    line_total_re, = ax1.plot([], [], color='red', lw=2, label=r'$Re[\Psi(x,t)]$')
+    line_individuals = [ax1.plot([], [], '--', lw=1.2, label=fr'$Re[\Psi_{{{n}}}(x)]$')[0] for n in ns]
+    ax1.set_xlim(0, L)
+    ax1.set_ylim(-2, 2)
+    ax1.set_xlabel('x')
+    ax1.set_ylabel('Amplitude')
+    ax1.set_title('Real part of $\Psi$')
+    ax1.legend()
+
+# --- Right: |Psi|² ---
+    line_prob, = ax2.plot([], [], color='red', label=r'$|\Psi(x,t)|^2$')
+    line_individuals_prob = [ax2.plot([], [], '--', label=fr'$|\Psi_{{{n}}}|^2$')[0] for n in ns]
+    ax2.set_xlim(0, L)
+    ax2.set_ylim(0, 6)
+    ax2.set_xlabel('x')
+    ax2.set_ylabel('Probability Density')
+    ax2.set_title('Probability Density $|\Psi|^2$')
+    ax2.legend()
 
     def init():
-        line_total.set_data([], [])
+        line_total_re.set_data([], [])
+        line_prob.set_data([], [])
         for line in line_individuals:
             line.set_data([], [])
-        return [line_total] + line_individuals
+        for line in line_individuals_prob:
+            line.set_data([], [])
+            
+        return [line_total_re, line_prob] + line_individuals + line_individuals_prob
 
     def update(frame):
         t = frame * speed
         psi = psi_superposed(x, t, L, ns, cs)
-        prob_density = np.abs(psi) ** 2
-        line_total.set_data(x, prob_density)
-
+        line_total_re.set_data(x, np.real(psi))
+        line_prob.set_data(x, np.abs(psi)**2)
+        
         for line, n, c in zip(line_individuals, ns, cs):
-            line.set_data(x, (np.abs(c * psi_n(n, x, L)) ** 2))
+            psi_n_val =  psi_n(n, x, L)
+            line.set_data(x, np.real(psi_n_val))
+            
+        for line, n, c in zip(line_individuals_prob, ns, cs):
+            line.set_data(x, (np.abs( psi_n(n, x, L)) ** 2))
 
-        return [line_total] + line_individuals
+        return [line_total_re, line_prob] + line_individuals + line_individuals_prob
 
-    ani = FuncAnimation(fig, update, frames=100, interval=interval, init_func=init, blit=True)
+    ani = FuncAnimation(fig, update, frames=200, init_func=init, blit=True, interval=interval)
 
     tmpfile = tempfile.NamedTemporaryFile(delete=False, suffix='.gif')
     ani.save(tmpfile.name, writer=PillowWriter(fps=1000 // interval))
@@ -99,15 +122,14 @@ def generate_animation_base64(L, ns, cs, speed=0.009, interval=100):
 # Streamlit UI
 st.title("Quantum Superposition in a 1D Box")
 
-
 n_vals = []
 c_vals = []
 
 st.sidebar.header("Quantum States and Coefficients")
 
 # Input number of basis states
-st.sidebar.markdown("### Number of energy eigenstates in the superposition")
-N = st.sidebar.number_input("N", min_value=1, max_value=10, value=3, step=1, key="num_states")
+st.sidebar.markdown("### Number of energy eigen states in the superposition")
+N = st.sidebar.number_input("N", min_value=1, max_value=10, value=1, step=1, key="num_states")
 
 # Input fields for each state
 for i in range(N):
@@ -122,13 +144,12 @@ for i in range(N):
     c_vals.append(complex(c_real, c_imag))
 
 
-
 # Show normalization constant input
 st.sidebar.markdown("### Normalization Factor")
 #row1 = st.sidebar.rows(1)
 norm_factor = st.sidebar.number_input(f"norm_factor", value=1.0,format="%.3f" )
 st.sidebar.markdown("### Length of Box")
-L= st.sidebar.number_input(f"L",value=1,step=1 )#1  # Or get this from user input if needed
+L= st.sidebar.number_input(f"L",min_value=0.5,max_value=10.0,value=1.0,step=0.5 )#1  # Or get this from user input if needed
 
 # Normalize the coefficients
 c_vals = [c / norm_factor for c in c_vals]
@@ -137,7 +158,7 @@ c_vals = [c / norm_factor for c in c_vals]
 norm_check = np.sum(np.abs(c)**2 for c in c_vals)
 
 if abs(np.sqrt(norm_check) - 1.0) < 1e-3:
-    st.success(f"✅ Normalized: $\sum |c_i|^2 = {norm_check:.3f}$")
+    st.success(f"✅ Normalized: $\sum |c_i|^2 = {norm_check:.2f}$")
 else:
     st.error(f"❌ Not normalized: $\sum |c_i|^2 = {norm_check:.3f}. Please adjust.")
 #st.info("Amplitudes auto-normalized to ensure c₁² + c₂² = 1.")
@@ -153,10 +174,7 @@ with col1:
 with col2:
     if st.button("⏹️ Stop Animation"):
         st.session_state["running"] = False
-#with col3:
-#    if st.button("📸 Capture Snapshot"):
-#        st.session_state["snapshot_requested"] = True
-# Animation or snapshot
+
 if abs(np.sqrt(norm_check)- 1.0) < 1e-3:
     if st.session_state["running"]:
     # Show animation
@@ -174,17 +192,30 @@ if abs(np.sqrt(norm_check)- 1.0) < 1e-3:
         psi = psi_superposed(x, t_snapshot, L, n_vals, c_vals)
         prob_density = np.abs(psi)**2
 
-        fig, ax = plt.subplots()
-        ax.plot(x, prob_density, 'r-', label=r'$|\Psi_{\text{total}}|^2$')
+#        fig, ax = plt.subplots(figsize=(8, 4))
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+        ax1.plot(x, np.real(psi), 'r-', label=r'$\text{Re}[\Psi(x,t)]$')
 
     # Dynamically plot each component probability density
         colors = ['b--', 'g--', 'y--', 'm--', 'c--']
         for i, (n, c) in enumerate(zip(n_vals, c_vals)):
-            component_density = np.abs(c * psi_n(n, x, L))**2
-            ax.plot(x, component_density, colors[i % len(colors)], label=fr'$|\Psi_{{{n}}}|^2$')
+            component_density = np.real( psi_n(n, x, L))
+            ax1.plot(x, component_density, colors[i % len(colors)], label=fr'$\Psi_{{{n}}}(x)$')
 
-        ax.legend()
-        ax.set_title(f"Snapshot at frame {frame_number}, time t = {t_snapshot:.3f} s")
+        ax1.legend()
+        ax1.set_title(f"Snapshot at frame {frame_number}, time t = {t_snapshot:.3f} s")
+        
+        ax2.plot(x, prob_density, 'r-', label=r'$|\Psi(x,t)|^2$')
+
+    # Dynamically plot each component probability density
+        colors = ['b--', 'g--', 'y--', 'm--', 'c--']
+        for i, (n, c) in enumerate(zip(n_vals, c_vals)):
+            component_density = np.abs( psi_n(n, x, L)) ** 2
+            ax2.plot(x, component_density, colors[i % len(colors)], label=fr'$|\Psi_{{{n}}}(x)|^2$')
+
+        ax2.legend()
+        ax2.set_title(f"Snapshot at frame {frame_number}, time t = {t_snapshot:.3f} s")
+    
         st.pyplot(fig)
 
         st.session_state["snapshot_requested"] = False
@@ -199,9 +230,9 @@ f"({np.round(c.real, 3)}{f'{np.round(c.imag, 3):+}i' if c.imag else ''})\\Psi_{{
 st.markdown(f"$$\\Psi(x, t) = {expr}$$", unsafe_allow_html=True)
 
 
-# Measurement / Collapse
+# Energy Measurement / Collapse
 if abs(np.sqrt(norm_check)- 1.0) < 1e-3:
-    if st.button("🔘️Make observation "):
+    if st.button("🔘️Measure Energy "):
         with st.spinner("Collapsing..."):
             probs = np.abs(np.array(c_vals))**2
             probs = probs / np.sum(probs)  # normalize
@@ -217,14 +248,52 @@ if abs(np.sqrt(norm_check)- 1.0) < 1e-3:
             collapsed_state = psi_n(outcome, x, L)
             probability = np.abs(collapsed_state) ** 2
 
-            fig, ax = plt.subplots(figsize=(8, 5))
-            ax.plot(x, probability, label=rf'$|\Psi_{{{outcome}}}|^2 \text{{ collapsed}}$', color='red')
+#            fig, ax = plt.subplots(figsize=(8, 5))
+            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+            ax1.plot(x, collapsed_state, label=rf'$\text{{Re}}(\Psi_{{{outcome}}}(x))$', color='red')
+            ax1.set_xlim(0, L)
+            ax1.set_ylim(np.min(collapsed_state)*1.2,np.max(collapsed_state)*1.2)#0, np.max(probability)*1.2)
+            ax1.set_title(fr'Wavefunction collapsed to $\Psi_{{{outcome}}}$ and energy $E_{{{outcome}}}$')
+            ax1.set_xlabel('x')
+            ax1.set_ylabel('Amplitude')
+            ax1.legend()
+            
+            ax2.plot(x, probability, label=rf'$|\Psi_{{{outcome}}}|^2 $', color='red')
+            ax2.set_xlim(0, L)
+            ax2.set_ylim(0, np.max(probability)*1.2)
+#            ax2.set_title(fr'Wavefunction collapsed to $\Psi_{{{outcome}}}$ with probability {collapse_prob:.3f}')
+            ax2.set_xlabel('x')
+            ax2.set_ylabel('Probability Density')
+            ax2.legend()
+            st.pyplot(fig)
+            
+# Position Measurement / Collapse
+if abs(np.sqrt(norm_check) - 1.0) < 1e-3:
+    if st.button("🔘️Measure Position"):
+        with st.spinner("Collapsing..."):
+            x = np.linspace(0, L, 1000)
+            t = 0.009  # Time of measurement
+
+            # Evaluate probability density from superposed state
+            psi_vals = psi_superposed(x, t, L, n_vals, c_vals)
+            prob_density = np.abs(psi_vals)**2
+            prob_density /= np.trapz(prob_density, x)  # Normalize
+
+            # Sample measurement outcome x0
+            x0 = np.random.choice(x, p=prob_density/np.sum(prob_density))
+            sigma = 0.02 * L
+
+            # Collapse: Gaussian centered at x0
+            collapsed_state = np.exp(-(x - x0)**2 / (2 * sigma**2))
+            collapsed_state /= np.sqrt(np.trapz(np.abs(collapsed_state)**2, x))
+
+            # Plot collapsed wavefunction
+            fig, ax = plt.subplots(figsize=(8, 4))
+            ax.plot(x, collapsed_state, label=fr'$\Psi(x)$ after measurement', color='red')
             ax.set_xlim(0, L)
-            ax.set_ylim(0, np.max(probability)*1.2)
-            ax.set_title(fr'Collapsed to $\Psi_{{{outcome}}}$ with probability {collapse_prob:.3f}')
+            ax.set_ylim(np.min(collapsed_state)*1.2, np.max(collapsed_state)*1.2)
+            ax.set_title(fr'Wavefunction collapsed at $x = {x0:.2f}$')
             ax.set_xlabel('x')
-            ax.set_ylabel('Probability Density')
+            ax.set_ylabel('Amplitude')
             ax.legend()
             st.pyplot(fig)
-
-
