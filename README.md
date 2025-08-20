@@ -11,6 +11,6 @@ An interactive Streamlit app for visualizing the time evolution of quantum state
 
 ### 1. Clone the repository
 
-git clone https://github.com/sgopalk/Quantum-Superposition-in-1D-Box.git
+git clone https://github.com/sgopalk/Quantum-Superposition.git
 
 
