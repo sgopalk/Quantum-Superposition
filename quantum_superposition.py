@@ -236,7 +236,7 @@ for i in range(N):
 # Show normalization constant input
 st.sidebar.markdown("### Normalization Factor")
 #row1 = st.sidebar.rows(1)
-A = st.sidebar.number_input(f"A")
+A = st.sidebar.number_input("A", step=0.0001, format="%.4f")
 if potential == "1D Infinite Square Well": 
     st.sidebar.markdown("### Length of Box")
     L= st.sidebar.number_input(f"L",min_value=0.5,max_value=10.0,value=1.0,step=0.5 )#1  # Or get this from user input if needed
