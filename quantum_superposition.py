@@ -226,8 +226,12 @@ for i in range(N):
         n = col1.number_input(f"$n_{{{i+1}}}$", min_value=1, value=i + 1, step=1, key=f"n{i}")
     else:
         n = col1.number_input(f"$n_{{{i+1}}}$", min_value=0, value=i + 1, step=1, key=f"n{i}")
-    c_real = col2.number_input(f"Re($c_{i+1}$)", value=1.0 if i == 0 else 0.0, step=0.1, format="%.3f", key=f"re{i}")
-    c_imag = col3.number_input(f"Im($c_{i+1}$)", value=0.0, step=0.1, format="%.3f", key=f"im{i}")
+    c_real_str = col2.text_input(f"Re($c_{{{i+1}}}$)", value="1.0" if i == 0 else "0.0", key=f"re_str{i}" )
+    c_real = float(c_real_str)
+    #c_real = col2.number_input(f"Re($c_{i+1}$)", value=1.0 if i == 0 else 0.0, step=0.1, format="%.3f", key=f"re{i}")
+    c_imag_str = col3.text_input(f"Im($c_{{{i+1}}}$)", value="0.0",  key=f"im_str{i}")
+    c_imag = float(c_imag_str)
+    #c_imag = col3.number_input(f"Im($c_{i+1}$)", value=0.0, step=0.1, format="%.3f", key=f"im{i}")
 
     n_vals.append(n)
     c_vals.append(complex(c_real, c_imag))
