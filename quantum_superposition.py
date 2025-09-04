@@ -278,9 +278,8 @@ if potential == "1D Infinite Square Well":
             st.markdown(animation_html, unsafe_allow_html=True)
 
 # Either manually capture snapshot or always show one when not running
-        frame_number = st.slider("Select frame number for snapshot", min_value=0, max_value=300, value=100)
-        dt = 0.009
-        t_snapshot = frame_number * dt
+        t_snapshot = st.slider("Select time for snapshot", 
+                       min_value=0.0, max_value=3.0, value=1.0, step=0.01)
 
 # Snapshot plot
         if not st.session_state["running"] or st.session_state["snapshot_requested"]:
@@ -299,7 +298,7 @@ if potential == "1D Infinite Square Well":
                 ax1.plot(x, component_density, colors[i % len(colors)], label=fr'$\text{{Re}}[\Psi_{{{n}}}(x,t)]$')
 
             ax1.legend()
-            ax1.set_title(f"Snapshot at frame {frame_number}, time t = {t_snapshot:.3f} s")
+            ax1.set_title(f"Snapshot at time t = {t_snapshot:.3f} s")
             ax1.set_xlabel('x')
             ax1.set_ylabel('Amplitude')
             ax2.plot(x, prob_density, 'r-', label=r'$|\Psi(x,t)|^2$')
@@ -311,7 +310,7 @@ if potential == "1D Infinite Square Well":
                 ax2.plot(x, component_density, colors[i % len(colors)], label=fr'$|\Psi_{{{n}}}(x,t)|^2$')
 
             ax2.legend()
-            ax2.set_title(f"Snapshot at frame {frame_number}, time t = {t_snapshot:.3f} s")
+            ax2.set_title(f"Snapshot at time t = {t_snapshot:.3f} s")
             ax2.set_xlabel('x')
             ax2.set_ylabel('Probability Density')
             st.pyplot(fig)
@@ -410,9 +409,8 @@ elif potential == "1D Harmonic Oscillator":
             st.markdown(animation_html, unsafe_allow_html=True)
 
 # Either manually capture snapshot or always show one when not running
-        frame_number = st.slider("Select frame number for snapshot", min_value=0, max_value=300, value=100)
-        dt = 0.009
-        t_snapshot = frame_number * dt
+        t_snapshot = st.slider("Select time for snapshot", 
+                       min_value=0.0, max_value=3.0, value=1.0, step=0.01)
 
 # Snapshot plot
         if not st.session_state["running"] or st.session_state["snapshot_requested"]:
@@ -431,7 +429,7 @@ elif potential == "1D Harmonic Oscillator":
                 ax1.plot(x, component_density, colors[i % len(colors)], label=fr'$\text{{Re}}[\Psi_{{{n}}}(x,t)]$')
 
             ax1.legend()
-            ax1.set_title(f"Snapshot at frame {frame_number}, time t = {t_snapshot:.3f} s")
+            ax1.set_title(f"Snapshot at time t = {t_snapshot:.3f} s")
             ax1.set_xlabel('x')
             ax1.set_ylabel('Amplitude')
         
@@ -444,7 +442,7 @@ elif potential == "1D Harmonic Oscillator":
                 ax2.plot(x, component_density, colors[i % len(colors)], label=fr'$|\Psi_{{{n}}}|^2$')
 
             ax2.legend()
-            ax2.set_title(f"Snapshot at frame {frame_number}, time t = {t_snapshot:.3f} s")
+            ax2.set_title(f"Snapshot at time t = {t_snapshot:.3f} s")
             ax2.set_xlabel('x')
             ax2.set_ylabel('Probability Density')
             st.pyplot(fig)
