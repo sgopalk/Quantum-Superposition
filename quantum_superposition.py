@@ -327,7 +327,7 @@ if potential == "1D Infinite Square Well":
         
 
     
-        st.markdown("### Normalized Superposed State of the 1D Box")
+        st.markdown("### Normalized Superposition State of the 1D Box")
         expr = " + ".join([
         f"({np.round(c.real, 3)}{f'{np.round(c.imag, 3):+}i' if c.imag else ''})\\Psi_{{{n}}}(x,t)"
             for n, c in zip(n_vals, c_vals)])
@@ -457,7 +457,7 @@ elif potential == "1D Harmonic Oscillator":
         st.markdown(r"$$\Psi_n(x,t) = \sqrt{\frac{\alpha}{\sqrt{\pi}2^n n!}} e^{-\alpha^2 x^2/2}H_n(\alpha x)\, e^{{-iE_{{{n}}}t/\hbar}}$$", unsafe_allow_html=True)
         st.markdown(r"$$E_n = \left(n+\frac{1}{2}\right)\hbar \omega,\quad n=0,1,2...$$", unsafe_allow_html=True)
     
-        st.markdown("### Normalized superposed state of the 1D harmonic oscillator")
+        st.markdown("### Normalized superposition state of the 1D harmonic oscillator")
         expr = " + ".join([
         f"({np.round(c.real, 3)}{f'{np.round(c.imag, 3):+}i' if c.imag else ''})\\Psi_{{{n}}}(x,t)"
             for n, c in zip(n_vals, c_vals)])
