@@ -532,6 +532,3 @@ elif potential == "1D Harmonic Oscillator":
                 ax.legend()
                 st.pyplot(fig)
                 
-if st.button("🛑️ Quit"):
-    st.write("Shutting down...")
-    os.kill(os.getpid(), signal.SIGTERM)   
