@@ -247,10 +247,11 @@ if potential == "1D Infinite Square Well":
     L= st.sidebar.number_input(f"L",min_value=0.5,max_value=10.0,value=1.0,step=0.5 )#1  # Or get this from user input if needed
 
 # Normalize the coefficients
-c_vals = [c * A for c in c_vals]
+c_vals = np.array([c * A for c in c_vals], dtype=complex)
 
 # Check normalization: sum of |c|^2
-norm_check = np.sum(np.abs(c)**2 for c in c_vals)
+#norm_check = np.sum(np.abs(c)**2 for c in c_vals)
+norm_check = np.sum(np.abs(c_vals)**2)
 
 if abs(np.sqrt(norm_check) - 1.0) < 1e-3:
     st.success(f"✅ Normalized: $\sum |c_i|^2 = {norm_check:.2f}$")
